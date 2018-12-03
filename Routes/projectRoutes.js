@@ -25,22 +25,41 @@ if(!req.body.title || !req.body.author || !req.body.desc){
 
     }
         })
-        .get(function(req,res,next){
-            let query = {}
+       
+       .get(function(req,res,next){
+           let perPage = 10
+           let page = req.params.page || 1
+           let limit = parseInt(req.query.limit) || 10
 
-            if(req.query.author)
-            {
-                query.author = req.query.author
-            }
-            Project.find(query,function(err,project){
-                if(err)
-                    res.status(500).send(err)
+           Project.find({})
+           .skip((perPage * page) - perPage)
+           .limit(perPage)
+           .exec(function(err,projects){
+               Project.count().exec(function(err, count){
+                   if (err) return next(err)
+                   let response = {
+                       items: projects,
+                       _links:{
+                           self:{
+                               href: "http://amycmgt.tk/projects"
+                            }
+                        },
+                        "pagination": {'currentPage': page,
+                                        'currentItems': limit,
+                                        'totalPages': Math.ceil(count / perPage),
+                                        'totalItems': count
+                                    },
+                                    
+                   }
+                   
+                   res.json(response)
+               })
+           })
+       })
 
-                else
-                    res.json({items: project})
-            })
+       
+        
 
-        })
         projectRouter.use('/:projectId',function(req,res,next){
             Project.findById(req.params.projectId,function(err,project){
                 if(err)
@@ -59,6 +78,7 @@ if(!req.body.title || !req.body.author || !req.body.desc){
         projectRouter.route('/:projectId')
         .get(function(req,res,next){
 
+            
             res.json(req.project)
 
 
@@ -66,7 +86,12 @@ if(!req.body.title || !req.body.author || !req.body.desc){
         .put(function(req,res,next){
 
                 req.project.title = req.body.title
+                req.project.desc = req.body.desc
                 req.project.author = req.body.author
+                if(!req.body.title || !req.body.author || !req.body.desc){
+                    res.sendStatus(400)
+                }
+                else{
                 req.project.save(function(err){
                     if(err)
                     res.status(500).send(err)
@@ -74,6 +99,7 @@ if(!req.body.title || !req.body.author || !req.body.desc){
                         res.json(req.project)
                     }
                 })
+            }
 
         })
         .patch(function(req,res,next){
@@ -95,7 +121,7 @@ if(!req.body.title || !req.body.author || !req.body.desc){
             if(err)
                 res.status(500).send(err)
             else{
-                res.status(204).send('project removed')
+                res.sendStatus(204, 'project removed')
             }
         })
     })

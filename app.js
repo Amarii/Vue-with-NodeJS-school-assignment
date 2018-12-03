@@ -9,8 +9,8 @@ const app = express()
 const port = process.env.PORT || 7000
 
 
-app.options("/projects", function(req, res, next){
-  res.header('Access-Control-Allow-Origin', '*');
+app.options("/:projectId", function(req, res, next){
+  
  res.header('allow', 'GET,POST,OPTIONS');
   res.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
@@ -27,6 +27,7 @@ app.use(bodyParser.urlencoded({extended:true}))
 let projectRouter = require('./Routes/projectRoutes')(project)
 app.use(function(req,res,next){
     if(req.accepts('json')){
+        res.header('Access-Control-Allow-Origin', '*');
         next()
         return
     }
