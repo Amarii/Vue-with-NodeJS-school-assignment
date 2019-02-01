@@ -11,7 +11,7 @@ const port =  7000
 
 app.options("/projects", function(req, res, next){
 
- res.header('Allow', 'GET,POST,OPTIONS')
+ res.header('Allow', 'GET,POST,OPTIONS,DELETE')
   res.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,DELETE')
   res.set({ 'content-type': 'application/json;charset=utf-8' })
   res.set({ 'Accept': 'application/json' })

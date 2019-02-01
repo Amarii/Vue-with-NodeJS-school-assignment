@@ -13,7 +13,7 @@ let routes = function(Project){
             project._links.self.href = "http://amycmgt.tk/projects/" + project._id
             project._links.collection.href = "http://amycmgt.tk/projects/"
 if(!req.body.title || !req.body.author || !req.body.desc){
-    res.sendStatus(400)
+    res.status(400).send('error')
     }
     else{
             project.save(function(err){
@@ -102,6 +102,7 @@ if((previousPage) == 0){
         .get(function(req,res,next){
 
 
+            
             res.json(req.project)
 
 
